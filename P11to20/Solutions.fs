@@ -39,21 +39,6 @@
 
 type 'a Encoding = Multiple of int * 'a | Single of 'a
 
-(*[omit:(Solution)]*)
-/// From problem 9 
-let pack xs = 
-    let collect x = function
-        | [] -> failwith "empty list you fool!"
-        | []::xss -> [x]::xss
-        | (y::xs)::xss as acc -> 
-            if x = y then
-                (x::y::xs)::xss
-            else
-                [x]::acc
-    List.foldBack collect xs [[]]
-
-let encodeModified xs = xs |> pack |> List.map (Seq.countBy id >> Seq.head >> fun(x,n)-> if n = 1 then Single x else Multiple (n,x))
-(*[/omit]*)
 // [/snippet]
 
 
@@ -69,13 +54,6 @@ let encodeModified xs = xs |> pack |> List.map (Seq.countBy id >> Seq.head >> fu
 /// val it : char list =
 ///   ['a'; 'a'; 'a'; 'a'; 'b'; 'c'; 'c'; 'a'; 'a'; 'd'; 'e'; 'e'; 'e'; 'e']
 
-(*[omit:(Solution)]*)
-let decodeModified xs = 
-    let expand = function
-        | Single x -> [x]
-        | Multiple (n,x) -> List.replicate n x
-    xs |> List.collect expand
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 13 : Run-length encoding of a list (direct solution).]
@@ -95,16 +73,6 @@ let decodeModified xs =
 ///   [Multiple (4,'a'); Single 'b'; Multiple (2,'c'); Multiple (2,'a');
 ///    Single 'd'; Multiple (4,'e')]
 
-(*[omit:(Solution)]*)
-let encodeDirect xs = 
-    let collect x = function
-        | [] -> [Single x]
-        | Single y::xs when x = y -> Multiple(2, x)::xs
-        | Single _::_ as xs -> Single x::xs
-        | Multiple(n,y)::xs when y = x -> Multiple(n + 1, x)::xs
-        | xs -> Single x::xs
-    List.foldBack collect xs []
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 14 : Duplicate the elements of a list.]
@@ -117,35 +85,12 @@ let encodeDirect xs =
 /// > dupli [1; 2; 3]
 /// [1;1;2;2;3;3]
 
-(*[omit:(Solution 1)]*)
-let dupli xs = xs |> List.map (fun x -> [x; x]) |> List.concat
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let rec dupli' = function
-    | [] -> []
-    | x::xs -> x::x::dupli' xs
-(*[/omit]*)
 
-(*[omit:(Solution 3)]*)
-let dupli'' xs = [ for x in xs do yield x; yield x ]
-(*[/omit]*)
 
-(*[omit:(Solution 4)]*)
-let dupli''' xs = xs |> List.collect (fun x -> [x; x])
-(*[/omit]*)
 
-(*[omit:(Solution 5)]*)
-let dupli'''' xs = (xs,[]) ||> List.foldBack(fun x xs -> x::x::xs) 
-(*[/omit]*)
 
-(*[omit:(Solution 6)]*)
-let dupli''''' xs = ([], xs) ||> List.fold(fun xs x -> xs @ [x; x])
-(*[/omit]*)
 
-(*[omit:(Solution 7)]*)
-let dupli'''''' xs = xs |> List.collect (List.replicate 2)
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 15 : Replicate the elements of a list a given number of times.]
@@ -158,16 +103,7 @@ let dupli'''''' xs = xs |> List.collect (List.replicate 2)
 /// > repli (List.ofSeq "abc") 3
 /// val it : char list = ['a'; 'a'; 'a'; 'b'; 'b'; 'b'; 'c'; 'c'; 'c']
 
-(*[omit:(Solution 1)]*)
-let repli xs n = xs |> List.collect (List.replicate n)
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let repli' xs n= 
-    [ for x in xs do 
-        for i=1 to n do
-            yield x ]
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 16 : Drop every N'th element from a list.]
@@ -180,19 +116,7 @@ let repli' xs n=
 /// > dropEvery (List.ofSeq "abcdefghik") 3;;
 /// val it : char list = ['a'; 'b'; 'd'; 'e'; 'g'; 'h'; 'k']
 
-(*[omit:(Solution 1)]*)
-let dropEvery xs n = xs |> List.mapi (fun i x -> (i + 1,x)) |> List.filter(fun (i,_) -> i % n <> 0) |> List.map snd
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let dropEvery' xs n =
-    let rec drop xs count =
-        match xs,count with
-            | [], _ -> []
-            | _::xs, 1 -> drop xs n
-            | x::xs, _ -> x::drop xs (count - 1) 
-    drop xs n
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 17 : Split a list into two parts; the length of the first part is given.]
@@ -208,20 +132,6 @@ let dropEvery' xs n =
 /// val it : char list * char list =
 ///   (['a'; 'b'; 'c'], ['d'; 'e'; 'f'; 'g'; 'h'; 'i'; 'k'])
 
-(*[omit:(Solution)]*)
-let split xs n = 
-    let rec take n xs =
-        match xs,n with
-            | _,0 -> []
-            | [],_ -> []
-            | x::xs,n -> x::take (n-1) xs
-    let rec drop n xs =
-        match xs,n with
-            | xs,0 -> xs
-            | [],_ -> []
-            | _::xs,n -> drop (n-1) xs
-    take n xs, drop n xs
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 18 : Extract a slice from a list.]
@@ -238,31 +148,8 @@ let split xs n =
 /// > slice ['a';'b';'c';'d';'e';'f';'g';'h';'i';'k'] 3 7;;
 /// val it : char list = ['c'; 'd'; 'e'; 'f'; 'g']
 
-(*[omit:(Solution 1)]*)
-let slice xs s e =
-    let rec take n xs =
-        match xs,n with
-            | _,0 -> []
-            | [],_ -> []
-            | x::xs,n -> x::take (n-1) xs
-    let rec drop n xs =
-        match xs,n with
-            | xs,0 -> xs
-            | [],_ -> []
-            | _::xs,n -> drop (n-1) xs
-    let diff = e - s
-    xs |> drop (s - 1) |> take (diff + 1)
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let slice' xs s e = [ for (x,j) in Seq.zip xs [1..e] do
-                            if s <= j then
-                                yield x ]
-(*[/omit]*)
 
-(*[omit:(Solution 3)]*)
-let slice'' xs s e = xs |> Seq.zip (seq {1 .. e}) |> Seq.filter(fst >> (<=) s) |> Seq.map snd
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 19 : Rotate a list N places to the left.]
@@ -283,22 +170,7 @@ let slice'' xs s e = xs |> Seq.zip (seq {1 .. e}) |> Seq.filter(fst >> (<=) s) |
 /// > rotate ['a';'b';'c';'d';'e';'f';'g';'h'] (-2);;
 /// val it : char list = ['g'; 'h'; 'a'; 'b'; 'c'; 'd'; 'e'; 'f']
 
-(*[omit:(Solution 1)]*)
-// using problem 17
-let rotate xs n =
-    let at = let ln = List.length xs in abs <| (ln + n) % ln
-    let st,nd = split xs at
-    nd @ st
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let rec rotate' xs n =
-    match xs, n with
-        | [], _ -> []
-        | xs, 0 -> xs
-        | x::xs, n when n > 0 -> rotate' (xs @ [x]) (n - 1)
-        | xs, n -> rotate' xs (List.length xs + n)
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 20 : Remove the K'th element from a list.]
@@ -319,20 +191,5 @@ let rec rotate' xs n =
 /// > removeAt 1 <| List.ofSeq "abcd";;
 /// val it : char * char list = ('b', ['a'; 'c'; 'd'])
 
-(*[omit:(Solution 1)]*)
-let removeAt n xs = 
-    let rec rmAt acc xs n =
-        match xs, n with
-            | [], _ -> failwith "empty list you fool!"
-            | x::xs, 0 -> (x, (List.rev acc) @ xs)
-            | x::xs, n -> rmAt (x::acc) xs (n - 1)
-    rmAt [] xs n
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-// using problem 17
-let removeAt' n xs = 
-    let front,back = split xs n
-    List.head back, front @ List.tail back
-(*[/omit]*)
 // [/snippet]

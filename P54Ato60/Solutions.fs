@@ -150,40 +150,7 @@ let tree4 = Branch (1, Branch (2, Empty, Branch (4, Empty, Empty)),
 ///              Branch ('x', Empty, Empty))
 /// ]
 
-(*[omit:(Solution 1)]*)
-let rec cbalTree n =
-    match n with
-        | 0 -> [Empty]
-        | n -> let q,r = let x = n - 1 in x / 2, x % 2 
-               [ for i=q to q + r do
-                    for lt in cbalTree i do
-                       for rt in cbalTree (n - 1 - i) do
-                          yield Branch('x', lt, rt) ]
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let nodes t = 
-    let rec nodes' t cont = 
-        match t with
-            | Empty -> cont 0
-            | Branch(_, lt, rt) -> 
-                nodes' lt (fun nlt -> nodes' rt (fun nrt -> cont (1 + nlt + nrt)))
-    nodes' t id
-
-let rec allTrees n =
-    match n with
-        | 0 -> [Empty]
-        | n ->
-            [ for i=0 to n - 1 do
-                 for lt in cbalTree i do
-                    for rt in cbalTree (n - 1 - i) do
-                       yield Branch('x', lt, rt) ]
-
-let cbalTree' n = allTrees n |> List.filter(fun t -> 
-                                                match t with
-                                                    | Empty -> true
-                                                    | Branch(_, lt, rt) -> abs (nodes lt - nodes rt) <= 1 )
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 56 : Symmetric binary trees]
@@ -200,19 +167,6 @@ let cbalTree' n = allTrees n |> List.filter(fun t ->
 /// > symmetric <| Branch ('x', Branch ('x', Empty, Empty), Branch ('x', Empty, Empty))
 /// val it : bool = true
 
-(*[omit:(Solution)]*)
-let symmetric tree =
-    let rec mirror t1 t2 cont =
-        match t1,t2 with
-            | Empty,Empty -> cont true
-            | Empty, Branch _ -> cont false
-            | Branch _, Empty -> cont false
-            | Branch (_, lt1, rt1), Branch (_, lt2, rt2) -> 
-                mirror lt1 rt2 (fun isMirrorLeft -> mirror rt1 lt2 (fun isMirrorRight -> cont (isMirrorLeft && isMirrorRight)))
-    match tree with
-        | Empty -> true
-        | Branch (_,lt, rt) -> mirror lt rt id
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 57 : Binary search trees (dictionaries)]
@@ -242,22 +196,6 @@ let symmetric tree =
 /// > [3; 2; 5; 7; 1] |> construct |> symmetric;;
 /// val it : bool = true
 
-(*[omit:(Solution)]*)
-let insert x tree = 
-    let rec insert' t cont =
-        match t with
-            | Empty -> cont <| Branch(x, Empty, Empty)
-            | Branch(y, lt, rt) as t ->
-                if x < y then
-                    insert' lt <| fun lt' -> cont <| Branch(y, lt', rt)
-                elif x > y then
-                    insert' rt <| fun rt' -> cont <| Branch(y, lt, rt')
-                else
-                    t
-    insert' tree id
-
-let construct xs = xs |> List.fold(fun tree x -> insert x tree) Empty
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 58 : Generate-and-test paradigm]
@@ -280,9 +218,6 @@ let construct xs = xs |> List.fold(fun tree x -> insert x tree) Empty
 ///      ('x',Branch ('x',Branch ('x',Empty,Empty),Empty),
 ///       Branch ('x',Empty,Branch ('x',Empty,Empty)))]
 
-(*[omit:(Solution)]*)
-let symCbalTrees = cbalTree >> List.filter symmetric
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 59 : Construct height-balanced binary trees]
@@ -314,22 +249,6 @@ let symCbalTrees = cbalTree >> List.filter symmetric
 ///        ('x',Branch ('x',Branch ('x',Empty,Empty),Branch ('x',Empty,Empty)),
 ///         Branch ('x',Empty,Empty))]
 
-(*[omit:(Solution)]*)
-let hbalTree a height =
-    let rec loop h cont = 
-        match h with
-            | 0 -> cont [Empty, 0]
-            | 1 -> cont [Branch (a, Empty, Empty), 1]
-            | _ -> loop (h-1) (fun lts ->
-                       loop (h-2) (fun rts -> 
-                       cont <| [let t = lts @ rts 
-                                for (t1,h1) in t do
-                                    for (t2,h2) in t do
-                                        let ht = 1 + max h1 h2 
-                                        if ht = h then
-                                            yield Branch (a, t1, t2), ht] ))
-    loop height id |> List.map fst
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 60 : Construct height-balanced binary trees with a given number of nodes]
@@ -359,38 +278,4 @@ let hbalTree a height =
 ///     Branch ('x',Empty,Branch ('x',Empty,Empty))];
 ///    [Branch ('x',Branch ('x',Empty,Empty),Branch ('x',Empty,Empty))]]
 
-(*[omit:(Solution)]*)
-let minNodes height = 
-    let rec minNodes' h cont =
-        match h with
-        | 0 -> cont 0
-        | 1 -> cont 1
-        | _ -> minNodes' (h - 1) <| fun h1 -> minNodes' (h - 2) <| fun h2 -> cont <| 1 + h1 + h2
-    minNodes' height id
-
-let maxHeight nodes = 
-    let rec loop n acc =
-        match n with
-            | 0 -> acc
-            | _ -> loop (n >>> 1) (acc + 1)
-    let fullHeight = loop nodes 0 // this is the height of a tree with full nodes
-    let minNodesH1 = minNodes (fullHeight + 1)
-    if nodes < minNodesH1 then
-        fullHeight
-    else
-        fullHeight + 1
-
-let numNodes tree = 
-    let rec numNodes' tree cont =
-        match tree with
-            | Empty -> cont 0
-            | Branch(_, lt , rt) ->
-                numNodes' lt <| fun ln -> numNodes' rt <| fun rn -> cont <| 1 + ln + rn
-    numNodes' tree id
-
-let hbalTreeNodes x nodes = 
-    let maxH = maxHeight nodes
-    let minH = if maxH = 0 then 0 else maxH - 1
-    [minH .. maxH] |> List.collect(fun n -> hbalTree x n) |> List.filter(fun t -> nodes = numNodes t)
-(*[/omit]*)
 // [/snippet]

@@ -31,25 +31,7 @@
 /// > insertAt 'X' (List.ofSeq "abcd") 2;;
 /// val it : char list = ['a'; 'X'; 'b'; 'c'; 'd']
 
-(*[omit:(Solution 1)]*)
-let insertAt x xs n =
-    let rec insAt acc xs n =
-        match xs, n with
-            | [], 1 -> List.rev (x::acc)
-            | [], _ -> failwith "Empty list you fool!"
-            | xs, 1 -> List.rev (x::acc) @ xs
-            | x::xs, n -> insAt (x::acc) xs (n - 1)
-    insAt [] xs n
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let rec insertAt' x xs n =
-    match xs, n with
-        | [], 1 -> [x]
-        | [], _ -> failwith "Empty list you fool!"
-        | _, 1 -> x::xs
-        | y::ys, n -> y::insertAt' x ys (n - 1)
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 22 : Create a list containing all integers within a given range.]
@@ -62,9 +44,6 @@ let rec insertAt' x xs n =
 /// > range 4 9;;
 /// val it : int list = [4; 5; 6; 7; 8; 9]
 
-(*[omit:(Solution)]*)
-let range a b = [a..b]
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 23 : Extract a given number of randomly selected elements from a list.]
@@ -77,11 +56,6 @@ let range a b = [a..b]
 /// > rnd_select "abcdefgh" 3;;
 /// val it : seq<char> = seq ['e'; 'a'; 'h']
 
-(*[omit:(Solution)]*)
-let rnd_select xs n = 
-    let rndSeq = let r = new System.Random() in seq { while true do yield r.Next() }
-    xs |> Seq.zip rndSeq |> Seq.sortBy fst |> Seq.map snd |> Seq.take n
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 24 : Lotto: Draw N different random numbers from the set 1..M.]
@@ -95,15 +69,7 @@ let rnd_select xs n =
 /// val it : int list = [27; 20; 22; 9; 15; 29]
 
 // using problem 23
-(*[omit:(Solution)]*)
-let diff_select n m = rnd_select (seq { 1 .. m }) n |> List.ofSeq
-(*[/omit]*)
 
-(*[omit:(Solution)]*)
-let diff_select' n m = 
-    let rndSeq = let r = new System.Random() in Seq.initInfinite(ignore >> r.Next ) 
-    seq { 1 .. m } |> Seq.zip rndSeq |> Seq.sortBy fst |> Seq.map snd |> Seq.take n |> List.ofSeq
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 25 : Generate a random permutation of the elements of a list.]
@@ -116,18 +82,7 @@ let diff_select' n m =
 /// > rnd_permu <| List.ofSeq "abcdef";;
 /// val it : char list = ['b'; 'c'; 'd'; 'f'; 'e'; 'a']
 
-(*[omit:(Solution 1)]*)
-// using problem 23
-let rnd_permu xs = List.length xs |> rnd_select xs
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let rnd_permu' xs = 
-    let rec rndSeq = 
-        let r = new System.Random()
-        seq { while true do yield r.Next() }
-    xs |> Seq.zip rndSeq |> Seq.sortBy fst |> Seq.map snd |> List.ofSeq
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 26 : Generate the combinations of K distinct objects chosen from the N elements of a list.]
@@ -150,36 +105,7 @@ let rnd_permu' xs =
 ///    ['b'; 'c'; 'f']; ['b'; 'd'; 'e']; ['b'; 'd'; 'f']; ['b'; 'e'; 'f'];
 ///    ['c'; 'd'; 'e']; ['c'; 'd'; 'f']; ['c'; 'e'; 'f']; ['d'; 'e'; 'f']] 
 
-(*[omit:(Solution 1)]*)
-// as a bonus you get the powerset of xs with combinations 0 xs
-let rec combinations n xs =
-    match xs, n with
-        | [],_ -> [[]]
-        | xs, 1 -> [for x in xs do yield [x]]
-        | x::xs, n -> 
-            [for ys in combinations (n-1) xs do
-                yield x::ys
-             if List.length xs > n then
-                yield! combinations n xs
-             else
-                yield xs]
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-let rec combinations' n xs =
-    let rec tails = function
-        | [] -> [[]]
-        | _::ys as xs -> xs::tails ys
-    match xs, n with
-        | _, 0 -> [[]]
-        | xs, n ->
-            [ for tail in tails xs do
-                match tail with
-                    | [] -> ()
-                    | y::xs' ->
-                        for ys in combinations' (n - 1) xs' do
-                            yield y::ys ]
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 27 : Group the elements of a set into disjoint subsets.] 
@@ -221,23 +147,6 @@ let rec combinations' n xs =
 ///     ["evi"; "flip"; "gary"; "hugo"; "ida"]];...]
 /// (altogether 756 solutions)
 
-(*[omit:(Solution)]*)
-let rec group ns xs = 
-    let rec combination n xs = 
-        match n,xs with
-            | 0, xs -> [([], xs)]
-            | _, [] -> []
-            | n, x::xs -> 
-                let ts = [ for ys, zs in combination (n-1) xs do yield (x::ys, zs)]
-                let ds = [ for ys, zs in combination n xs do yield (ys, x::zs)]
-                ts @ ds
-    match ns,xs with
-        | [], _ -> [[]]
-        | n::ns, xs ->
-            [ for g, rs in combination n xs do
-                for gs in group ns rs do
-                    yield g::gs ]
-(*[/omit]*)
 // [/snippet]
     
 // [snippet: (**) Problem 28 : Sorting a list of lists according to length of sublists]
@@ -268,9 +177,4 @@ let rec group ns xs =
 /// > lfsort ["abc"; "de"; "fgh"; "de"; "ijkl"; "mn"; "o"];;
 /// val it : string list = ["ijkl"; "o"; "abc"; "fgh"; "de"; "de"; "mn"]
 
-(*[omit:(Solution)]*)
-let lsort xss = xss |> List.sortBy Seq.length
-
-let lfsort xss = xss |> Seq.groupBy (Seq.length) |> Seq.sortBy (snd >> Seq.length) |> Seq.collect snd |> List.ofSeq
-(*[/omit]*)
 // [/snippet]

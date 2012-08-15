@@ -64,26 +64,6 @@ let ga = [('b',['c'; 'f']); ('c',['b'; 'f']); ('d',[]); ('f',['b'; 'c'; 'k']);
 ///   (['b'; 'c'; 'd'; 'f'; 'g'; 'h'; 'k'],
 ///    [('b', 'c'); ('b', 'f'); ('c', 'f'); ('f', 'k'); ('g', 'h')])
 
-(*[omit:(Solution)]*)
-
-let graph2AdjacencyGraph ((ns, es) : 'a Graph) : 'a AdjacencyGraph = 
-    let nodeMap = ns |> List.map(fun n -> n, []) |> Map.ofList
-    (nodeMap,es) 
-    ||> List.fold(fun map (a,b) -> map |> Map.add a (b::map.[a]) |> Map.add b (a::map.[b]))
-    |> Map.toList
-    |> List.map(fun (a,b) -> a, b |> List.sort)
-    
-let adjacencyGraph2Graph (ns : 'a AdjacencyGraph) : 'a Graph= 
-    let sort ((a,b) as e) = if a > b then (b, a) else e
-    let nodes = ns |> List.map fst
-    let edges = (Set.empty, ns) 
-                ||> List.fold(fun set (a,ns) -> (set, ns) ||> List.fold(fun s b -> s |> Set.add (sort (a,b))) ) 
-                |> Set.toSeq 
-                |> Seq.sort 
-                |> Seq.toList
-    (nodes, edges)
-
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 81: Path from one node to another one]
@@ -100,21 +80,6 @@ let adjacencyGraph2Graph (ns : 'a AdjacencyGraph) : 'a Graph=
 /// > paths 2 6 [(1,[2;3]);(2,[3]);(3,[4]);(4,[2]);(5,[6]);(6,[5])];;
 /// val it : int list list = []
 
-(*[omit:(Solution)]*)
-
-let paths start finish (g : 'a AdjacencyGraph) = 
-    let map = g |> Map.ofList
-    let rec loop route visited = [
-        let current = List.head route
-        if current = finish then
-            yield List.rev route
-        else
-            for next in map.[current] do
-                if visited |> Set.contains next |> not then
-                    yield! loop (next::route) (Set.add next visited) 
-    ]
-    loop [start] <| Set.singleton start
-(*[/omit]*)
 // [/snippet]
 
 
@@ -133,19 +98,6 @@ let paths start finish (g : 'a AdjacencyGraph) =
 /// > cycle 1 [(1,[2;3]);(2,[3]);(3,[4]);(4,[2]);(5,[6]);(6,[5])];;
 /// val it : int list list = []
 
-(*[omit:(Solution)]*)
-let cycle start (g: 'a AdjacencyGraph) = 
-    let map = g |> Map.ofList
-    let rec loop route visited = [
-        let current = List.head route
-        for next in map.[current] do
-            if next = start then
-                yield List.rev <| next::route
-            if visited |> Set.contains next |> not then
-                yield! loop (next::route) (Set.add next visited) 
-    ]
-    loop [start] <| Set.singleton start
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 83: Construct all spanning trees]
@@ -161,28 +113,6 @@ let cycle start (g: 'a AdjacencyGraph) =
 /// <example in lisp>
 /// Example in F#:
 
-(*[omit:(Solution needed)]*)
-let solution83 = "your solution here!!"
-// this is not a solution. This is still a work in progress.
-type Color = White = 0 | Gray = 1 | Black = 2
-
-let s_tree (g : 'a AdjacencyGraph) = 
-    let gMap = g |> Map.ofList
-    let vertices = g |> List.map fst 
-    let rec loop ((vertices,edges) as g) u visited = [
-        match gMap.[u] |> List.filter(fun v -> Set.contains v visited |> not) with
-            | [] -> yield g
-            | nodes ->
-                for v in nodes do
-                    for (vs,es) in loop (vertices, edges) v (Set.add v visited) do
-                        yield (v::vs,(u,v)::es)
-    ]
-    vertices |> List.collect(fun u -> loop ([u],[]) u (Set.singleton u)) 
-
-let gs = [(1,[2;3;4]);(2,[1;3]);(3,[1;2;4]);(4,[1;3])]
-
-s_tree gs |> printfn "%A"
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 84: Construct the minimal spanning tree]
@@ -219,27 +149,6 @@ s_tree gs |> printfn "%A"
 ///    [('a', 'd'); ('d', 'f'); ('a', 'b'); ('b', 'e'); ('e', 'c'); ('e', 'g')])
 /// 
 
-(*[omit:(Solution)]*)
-let prim (s : 'a AdjacencyGraph) (weightFunction: ('a Edge -> int)) : 'a Graph = 
-    let map = s |> List.map (fun (n,ln) -> n, ln |> List.map(fun m -> ((n,m),weightFunction (n,m)))) |> Map.ofList
-    let nodes = s |> List.map fst
-    let emptyGraph = ([],[])
-
-    let rec dfs nodes (ns,es) current visited = 
-        if nodes |> Set.isEmpty then
-            (List.rev ns, List.rev es)
-        else
-                let (a,b) as edge = ns 
-                                    |> List.collect(fun n -> map.[n] 
-                                                             |> List.filter(fun ((n,m),w) -> Set.contains m visited |> not) ) 
-                                    |> List.minBy snd |> fst
-                let nodes' = nodes |> Set.remove b
-                dfs nodes' (b::ns,edge::es) b (Set.add b visited)
-    match nodes with
-        | [] -> emptyGraph
-        | n::ns -> dfs (Set ns) ([n],[]) n (Set.singleton n) 
-    
-(*[/omit]*)
 // [/snippet]
 
 
@@ -256,9 +165,6 @@ let prim (s : 'a AdjacencyGraph) (weightFunction: ('a Edge -> int)) : 'a Graph =
 /// 
 /// Example in F#: 
 
-(*[omit:(Solution needed)]*)
-let solution85 = "your solution here!!"
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 86: Node degree and graph coloration]
@@ -289,36 +195,6 @@ let solution85 = "your solution here!!"
 /// val it : (char * int) list =
 ///   [('a', 0); ('b', 1); ('c', 0); ('d', 1); ('e', 0); ('f', 2); ('g', 1)]
 
-(*[omit:(Solution)]*)
-
-let degree (g: 'a AdjacencyGraph) node = 
-    let es = g |> List.find(fst >> (=) node) |> snd
-    // The degree of a node is the number of edges that go to the node. 
-    // Loops get counted twice.
-    es |> List.sumBy(fun n -> if n = node then 2 else 1)
-
-let sortByDegreeDesc (g : 'a AdjacencyGraph) = 
-    // let use this degree function instead of the one above
-    // since we alredy have all the info we need right here.
-    let degree (u,adj) = adj |> List.sumBy(fun v -> if v = u then 2 else 1)
-    g |> List.sortBy(degree) |> List.rev
-
-let colorGraph g = 
-    let nodes = sortByDegreeDesc g
-    let findColor usedColors = 
-        let colors = Seq.initInfinite id
-        colors |> Seq.find(fun c -> Set.contains c usedColors |> not)
-    let rec greedy colorMap nodes =
-        match nodes with
-            | [] -> colorMap |> Map.toList
-            | (n,ns)::nodes -> 
-                let usedColors = ns |> List.filter(fun n -> Map.containsKey n colorMap) |> List.map(fun n -> Map.find n colorMap ) |> Set.ofList
-                let color = findColor usedColors
-                greedy (Map.add n color colorMap) nodes
-                
-    greedy Map.empty nodes
-
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 87: Depth-first order graph traversal (alternative solution)]
@@ -343,27 +219,6 @@ let colorGraph g =
 /// > depthFirstOrder gdfo 'a';;
 /// val it : char list = ['a'; 'e'; 'f'; 'b'; 'd'; 'c'; 'g']
 
-(*[omit:(Solution)]*)
-
-// The enum Color is defined on problem 83
-// The algorithm comes from the book Introduction to Algorithms by Cormen, Leiserson, Rivest and Stein.
-let depthFirstOrder (g : 'a AdjacencyGraph) start = 
-    let nodes = g |> Map.ofList
-    let color = g |> List.map(fun (v,_) -> v, Color.White) |> Map.ofList |> ref
-    let pi = ref [start]
-
-    let rec dfs u = 
-        color := Map.add u Color.Gray !color
-        for v in nodes.[u] do
-            if (!color).[v] = Color.White then
-                pi := (v::!pi)
-                dfs v
-        color := Map.add u Color.Black !color
-
-    dfs start
-    !pi |> List.rev
-
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 88: Connected components (alternative solution)]
@@ -381,24 +236,6 @@ let depthFirstOrder (g : 'a AdjacencyGraph) start =
 ///    [(3, [1; 2]); (2, [1; 3]); (1, [2; 3])]]
 /// > 
 
-(*[omit:(Solution)]*)
-// using problem 87 depthFirstOrder function
-let connectedComponents (g : 'a AdjacencyGraph) =
-    let nodes = g |> List.map fst |> Set.ofList
-    let start = g |> List.head |> fst
-    let rec loop acc g start nodes = 
-        let dfst = depthFirstOrder g start |> Set.ofList
-        let nodes' = Set.difference nodes dfst 
-        if Set.isEmpty nodes' then
-            g::acc
-        else
-            // once we have the dfst set we can remove those nodes from the graph and
-            // add them to the solution and continue with the remaining nodes
-            let (cg,g') = g |> List.fold(fun (xs,ys) v -> if Set.contains (fst v) dfst then (v::xs,ys) else (xs,v::ys)) ([],[])
-            let start' = List.head g' |> fst
-            loop (cg::acc) g' start' nodes'
-    loop [] g start nodes
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 89: Bipartite graphs]
@@ -420,43 +257,4 @@ let connectedComponents (g : 'a AdjacencyGraph) =
 /// > isBipartite gdfo;;
 /// val it : bool = true
 
-(*[omit:(Solution)]*)
-open System.Collections.Generic; // this is where Queue<'T> is defined
-
-let isBipartite (g : 'a AdjacencyGraph) = 
-    // using the breath-first search algorithm, we can compute the distances
-    // from the first node to the other the nodes. If all the even distance nodes
-    // point to odd nodes and viceversa, then the graph is bipartite. This works
-    // for connected graphs.
-    // The algorithm comes from the book Introduction to Algorithms by Cormen, Leiserson, Rivest and Stein.
-    let isBipartite' (g : 'a AdjacencyGraph) = 
-        let adj = g |> Map.ofList
-        // The Color enum is defined on problem 83
-        let mutable color = g |> List.map(fun (v,_) -> v, Color.White) |> Map.ofList
-        let mutable distances = g |> List.map(fun (v,_) -> v,-1) |> Map.ofList
-        let queue = new Queue<_>()
-        let start = List.head g |> fst
-        color <- Map.add start Color.Gray color
-        distances <- Map.add start 0 distances
-        queue.Enqueue(start)
-        while queue.Count <> 0 do
-            let u = queue.Peek()
-            for v in adj.[u] do
-                if color.[v] = Color.White then
-                    color <- Map.add v Color.Gray color
-                    distances <- Map.add v (distances.[u] + 1) distances
-                    queue.Enqueue(v)
-            queue.Dequeue() |> ignore
-            color <- Map.add u Color.Black color
-        let isEven n = n % 2 = 0
-        let isOdd = isEven >> not
-        let d = distances // this is just so distances can be captured in the closure below.
-        g |> List.forall(fun (v,edges) -> 
-                            let isOpposite = if d.[v] |> isEven then isOdd else isEven
-                            edges |> List.forall(fun e -> d.[e] |> isOpposite))
-
-    // split the graph in it's connected components (problem 88) and test each piece for bipartiteness.
-    // if all the pieces are bipartite, the graph is bipartite.
-    g |> connectedComponents |> List.forall isBipartite'
-(*[/omit]*)
 // [/snippet]

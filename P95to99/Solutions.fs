@@ -33,12 +33,6 @@
 /// > fullWords 175;;
 /// val it : string = "one-seven-five"
 
-(*[omit:(Solution)]*)
-let fullWords (n: int) = 
-    let words = [| "zero"; "one"; "two"; "three"; "four"; "five"; "six"; "seven"; "eight"; "nine" |]
-    let digits = n.ToString() |> Seq.map (fun c -> int c - int '0') |> Seq.map (fun c -> words.[c])|> Array.ofSeq
-    System.String.Join("-", digits)
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 96 : Syntax checker]
@@ -68,86 +62,7 @@ let fullWords (n: int) =
 /// > identifier "two--hyphens";;
 /// val it : bool = false
 
-(*[omit:(Solution 1)]*)
-// identifier = letter((-)?(letter|digit))*
-// Some people, when confronted with a problem, think "I know, I'll use regular expressions." Now they have two problems.  - Jamie Zawinski
-let identifier expr = System.Text.RegularExpressions.Regex.IsMatch(expr,@"^([a-z]|[A-Z])((\-)?([0-9]|[a-z]|[A-Z]))*$")
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-// This is the overkill solution using a parser combinator.
-// For a solution using fslex and fsyacc go here: https://github.com/paks/99-FSharp-Problems/tree/master/P96
-// The combinator came from here: http://v2matveev.blogspot.com/2010/05/f-parsing-simple-language.html
-type 'a ParserResult = Success of 'a * char list | Failed
-
-type 'a Parser = Parser of (char list -> 'a ParserResult)
-
-let apply (Parser p) s = p s
-
-let run p l = apply p (Seq.toList l)
-
-let one v = Parser(fun cs -> Success(v,cs))
-let fail() = Parser(fun _ -> Failed)
-
-let bind p f = Parser (fun cs ->
-        match apply p cs with        
-        | Success(r, cs2) -> apply (f r) cs2        
-        | Failed -> Failed)    
-
-let choose f p = Parser(fun cs ->
-    match cs with
-        | c::cs when f c -> Success(p c, cs)
-        | _ -> Failed)
-
-let (<|>) p1 p2 = Parser(fun cs ->
-    match apply p1 cs with
-        | Failed -> apply p2 cs
-        | result -> result)
-
-let (<&>) p1 p2 = Parser(fun cs ->
-    match apply p1 cs with
-        | Success(_, cs2) -> apply p2 cs2
-        | Failed -> Failed)
-
-let letter = choose System.Char.IsLetter id    
-
-let letterOrDigit = choose System.Char.IsLetterOrDigit id    
-
-let hiphen = choose ((=) '-') id    
-
-type ParseBuilder() =
-    member parser.Return(v) = one v
-    member parser.Bind(p, f) = bind p f
-    member parser.ReturnFrom(p) = p
-    member parser.Zero() = fail()
-
-let parser = new ParseBuilder()
-
-let rec zeroOrMany p f v0 = 
-    parser {
-        return! oneOrMany p f v0 <|> one v0
-    }
-
-and oneOrMany p f v0 = 
-    parser {
-        let! v1 = p
-        return! zeroOrMany p f (f v0 v1)
-    }
-
-let hiphenLetterOrDigit = (hiphen <&> letterOrDigit) <|> letterOrDigit
-
-let identifierP = parser {
-    let! l = letter
-    let sb = new System.Text.StringBuilder(l.ToString())
-    let! rest = sb |> zeroOrMany hiphenLetterOrDigit (fun acc v -> acc.Append(v))
-    return rest.ToString()
-}
-
-let identifier' str =
-    match run identifierP str with
-    | Success(_,[]) -> true //if the parser consumed all the input, then it's an identifier
-    | _ -> false
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (***) Problem 97 : Sudoku]
@@ -179,9 +94,6 @@ let identifier' str =
 /// missing spots with digits in such a way that every number between 1 and 9 appears exactly 
 /// once in each row, in each column, and in each square.
 
-(*[omit:(Solution)]*)
-let solution97 = "https://github.com/paks/ProjectEuler/blob/master/Euler2/P96/sudoku.fs"
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (***) Problem 98 : Nonograms]
@@ -231,9 +143,6 @@ let solution97 = "https://github.com/paks/ProjectEuler/blob/master/Euler2/P96/su
 ///  2 1 5 1
 ///
 
-(*[omit:(Solution needed)]*)
-let solution98 = "your solution here!!"
-(*[/omit]*)
 
 // [/snippet]
 
@@ -290,8 +199,5 @@ let solution98 = "your solution here!!"
 /// ,'O');((3,3),'P');((4,3),'P');((5,3),'Y');((3,5),'A');((4,5),'R');((5,5),'E');((
 /// 6,5),'S')]]
 
-(*[omit:(Solution needed)]*)
-let solution99 = "your solution here!!"
-(*[/omit]*)
 
 // [/snippet]

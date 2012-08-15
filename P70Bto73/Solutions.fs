@@ -76,13 +76,6 @@ let tree5 = Node ('a', [
 /// > nnodes tree2;;
 /// val it : int = 2 
 
-(*[omit:(Solution)]*)
-let rec nnodes = function
-    | Node (_, []) -> 1
-    | Node (_, xs) -> 
-        let t = xs |> List.sumBy (nnodes)
-        1 + t
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 70 : Tree construction from a node string.]
@@ -108,27 +101,6 @@ let rec nnodes = function
 /// > string2Tree "afg^^c^bd^e^^^" = tree5;;
 /// val it : bool = true
 
-(*[omit:(Solution)]*)
-let string2Tree str =
-    let chars = str |> List.ofSeq
-    let rec loop chars stack =
-        match chars with
-            | '^'::xs ->
-                match stack with
-                    | [x] -> x
-                    | tx::Node(y, ty)::stack' -> loop xs (Node(y, ty @ [tx])::stack')
-                    | [] -> failwith "malformed text"
-            | x::xs -> loop xs (Node(x,[])::stack)
-            | [] -> failwith "malformed text"
-    loop chars [] 
-
-let tree2String tree =
-    let rec loop tree =
-        match tree with
-            | Node(a, []) -> a.ToString() +  "^"
-            | Node(a, xs) -> a.ToString() + (xs |> List.fold(fun acc x -> acc + loop x) "")  + "^"
-    loop tree
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 71 : Determine the internal path length of a tree.]
@@ -143,13 +115,6 @@ let tree2String tree =
 /// > ipl tree4;;
 /// val it : int = 2
 
-(*[omit:(Solution)]*)
-let rec ipl tree = 
-    let rec loop depth = function
-        | Node(a, []) -> depth
-        | Node(a, xs) -> depth + (xs |> List.sumBy( fun x -> loop (depth+1) x))
-    loop 0 tree 
-(*[/omit]*)
 // [/snippet]
     
 // [snippet: (*) Problem 72 : Construct the bottom-up order sequence of the tree nodes.]
@@ -163,13 +128,6 @@ let rec ipl tree =
 /// > bottom_up tree4;;
 /// val it : string = "deb"
 
-(*[omit:(Solution)]*)
-let bottom_up tree = 
-    let rec loop = function
-        | Node(a, []) -> a.ToString()
-        | Node(a, xs) -> (xs |> List.fold( fun acc x -> acc + (loop x) ) "") + a.ToString()
-    loop tree 
-(*[/omit]*)
 // [/snippet]
  
 // [snippet: (**) Problem 73 : Lisp-like tree representation.]
@@ -222,30 +180,4 @@ let bottom_up tree =
 /// As a second, even more interesting exercise try to rewrite tree_ltl/2 in a way that the
 /// inverse conversion is also possible.
 
-(*[omit:(Solution)]*)
-let treeltl str = str |> List.ofSeq |> List.filter((<>) ' ')
-
-let displayLisp tree = 
-    let rec loop = function
-        | Node(a, []) -> a.ToString()
-        | Node(a, xs) -> "(" + a.ToString() + (xs |> List.fold( fun acc x -> acc + " " + (loop x) ) "") + ")"
-    loop tree 
-
-let lisp2Tree str = 
-    let tokens = treeltl str
-    let rec loop tokens stack =
-        match tokens with
-            | ')'::xs ->
-                match stack with
-                    | [x] -> x
-                    | tx::Node(y, ty)::stack' -> loop xs (Node(y, ty @ [tx])::stack')
-                    | [] -> failwith "malformed text"
-            | '('::x::xs -> loop xs (Node(x,[])::stack)
-            | x::xs -> 
-                match stack with
-                    | [] -> loop xs [Node(x,[])]
-                    | Node(y,t)::stack -> loop xs (Node(y,t @  [Node(x,[])])::stack)
-            | [] -> stack |> List.head
-    loop tokens []
-(*[/omit]*)
 // [/snippet]

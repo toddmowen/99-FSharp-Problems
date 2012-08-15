@@ -46,18 +46,6 @@ let tree4 = Branch (1, Branch (2, Empty, Branch (4, Empty, Empty)),
 /// > countLeaves tree4
 /// val it : int = 2
 
-(*[omit:(Solution)]*)
-let foldTree branchF emptyV t =
-    let rec loop t cont =
-        match t with
-        | Empty -> cont emptyV
-        | Branch(x,left,right) -> loop left  (fun lacc -> 
-                                  loop right (fun racc ->
-                                  cont (branchF x lacc racc)))
-    loop t id
-
-let counLeaves tree = tree |> foldTree (fun _ lc rc -> if lc + rc = 0  then 1 else 1+ lc + rc) 0
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 62 : Collect the internal nodes of a binary tree in a list]
@@ -72,10 +60,6 @@ let counLeaves tree = tree |> foldTree (fun _ lc rc -> if lc + rc = 0  then 1 el
 /// >internals tree4;;
 /// val it : int list = [1; 2]
 
-(*[omit:(Solution)]*)
-// using foldTree from problem 61
-let insternals tree = tree |> foldTree (fun x (lc,lt) (rc,rt) -> if lt || rt  then ([x] @ lc @ rc ,true) else ([], true)) ([],false) |> fst
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (*) Problem 62B : Collect the nodes at a given level in a list]
@@ -91,18 +75,6 @@ let insternals tree = tree |> foldTree (fun x (lc,lt) (rc,rt) -> if lt || rt  th
 /// >atLevel tree4 2;;
 /// val it : int list = [2,2]
 
-(*[omit:(Solution)]*)
-let atLevel tree level = 
-    let rec loop l tree cont =
-        match tree with
-            | Empty -> cont []
-            | Branch(x, lt , rt) -> 
-                if l = level then
-                    cont [x]
-                else
-                    loop (l + 1) lt (fun lacc -> loop (l + 1) rt (fun racc -> cont <| lacc @ racc))
-    loop 1 tree id
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 63 : Construct a complete binary tree]
@@ -138,24 +110,6 @@ let atLevel tree level =
 ///                                                    Branch ('x', Empty, Empty))
 /// val it : bool = true
 
-(*[omit:(Solution)]*)
-let completeBinaryTree n = 
-    let rec loop l cont =
-        if l <= n then
-            loop (2*l) (fun lt -> loop (2*l+1) (fun rt -> cont <| Branch ('x', lt, rt)))
-        else
-            cont Empty
-    loop 1 id
-
-let isCompleteBinaryTree tree =
-    let rec loop level tree cont =
-        match tree with
-            | Empty -> cont ([], 0)
-            | Branch(_, lt, rt) ->
-                loop (2*level) lt (fun (ll,lc) -> loop (2*level+1) rt (fun (rl, rc) -> cont <| ([level] @ ll @ rl, 1 + lc + rc)))
-    let levels, nodes = loop 1 tree (fun (ls,ns) -> List.sort ls, ns)
-    levels |> Seq.zip (seq { 1 .. nodes }) |> Seq.forall(fun (a,b) -> a = b)
-(*[/omit]*)
 // [/snippet]
     
 
@@ -229,22 +183,6 @@ let tree64 = Branch ('n',
 ///            Branch (('s', (11, 4)),Branch (('q', (10, 5)),Empty,Empty),Empty)),
 ///         Empty))
 
-(*[omit:(Solution)]*)
-let layout tree =
-    let next x = function
-        | Empty -> x
-        | Branch (_, _ , Branch ((_,(x,_)), _, _)) -> x + 1
-        | Branch ((_,(x,_)), _, _) -> x + 1
-    let rec loop x y tree cont =
-        match tree with
-            | Empty -> cont Empty
-            | Branch(a, lt, rt) ->
-                loop x (y+1) lt (fun lt' -> 
-                    let x' = next x lt'
-                    loop (x'+ 1) (y+1) rt (fun rt' -> 
-                        cont <| Branch((a,(x',y)), lt', rt')))
-    loop 1 1 tree id
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 65 : Layout a binary tree (2)]
@@ -302,23 +240,6 @@ let tree65 = Branch ('n',
 ///         Branch (('p', (19, 3)),Empty,Branch (('q', (21, 4)),Empty,Empty)),
 ///         Empty))
 
-(*[omit:(Solution)]*)
-let height tree = tree |> foldTree (fun _ lacc racc -> 1 + max lacc racc) 0
-
-let layout65 tree =
-    let separation = 
-        let depth = height tree
-        fun level -> (pown 2 <|  depth - level + 1) / 2
-    let rec loop x y tree cont =
-        match tree with
-            | Empty -> cont Empty
-            | Branch(a, lt, rt) ->
-                let sep = separation (y+1)
-                loop (x - sep) (y+1) lt (fun lt' -> 
-                    loop (x + sep) (y+1) rt (fun rt' -> 
-                        cont <| Branch((a,(x, y)), lt', rt')))
-    loop (separation 1 - 1) 1 tree id
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (***) Problem 66 : Layout a binary tree (3)]
@@ -364,44 +285,6 @@ let layout65 tree =
 ///        (('u', (7, 2)),
 ///         Branch (('p', (6, 3)),Empty,Branch (('q', (7, 4)),Empty,Empty)),Empty))
 
-(*[omit:(Solution)]*)
-let layout66 tree = 
-    // This functions places the tree on a grid with the root node on (0,1)
-    let rec helper gs x y tree = 
-        let guards gs = 
-            let children = function
-                | Branch(_, l, r) -> [r; l]
-                | Empty -> []
-            List.collect children gs
-
-        let isNotGuarded x = function
-            | Branch((_,(x', _)), _, _)::_ -> x > x'
-            | _ -> true
-
-        let rec placeNode gs a x y radius l r =
-            match helper gs (x + radius) (y + 1) r with
-                | None -> placeNode gs a (x + 1) y (radius + 1) l r // increase the radius
-                | Some r' -> Some <| Branch ((a,(x,y)), l, r')
-
-        match tree with
-            | Empty -> Some Empty
-            | Branch(a, l, r) when isNotGuarded x gs ->
-                helper (guards gs) (x - 1) (y + 1) l 
-                |> Option.bind(fun l' -> placeNode (l' :: guards gs) a x y 1 l' r)
-            | _ -> None
-
-    // find the X coordinate of the farthest node to the left
-    let rec findX = function
-        | Branch((_,(x,_)), Empty , _) -> x 
-        | Branch(_, l , _) -> findX l
-        | Empty -> 0
-
-    let tree' = helper [] 0 1 tree |> Option.get
-    let minX = -1 + findX tree'
-
-    // translate the tree so that the farthest node to the left is on the 1st column.
-    foldTree (fun (a,(x,y)) lacc racc -> Branch((a,(x-minX,y)), lacc, racc) ) Empty tree'
-(*[/omit]*)
 // [/snippet]
 
 
@@ -431,45 +314,7 @@ let layout66 tree =
 /// > "a(b(d,e),c(,f(g,)))" |> stringToTree |> treeToString = "a(b(d,e),c(,f(g,)))";;
 /// val it : bool = true
 
-(*[omit:(Solution 1)]*)
-let treeToString tree = 
-    let rec loop t cont =
-        match t with
-            | Empty -> cont ""
-            | Branch(x, Empty, Empty) -> cont <| x.ToString()
-            | Branch(x, lt, rt) ->
-                loop lt <| fun lstr -> loop rt <| fun rstr -> cont <| x.ToString() + "(" + lstr + "," + rstr + ")"
-    loop tree id
-(*[/omit]*)
 
-(*[omit:(Solution 2)]*)
-// using foldTree
-let treeToString' tree = tree |> foldTree (fun x lstr rstr -> if lstr = "" && rstr = "" then x.ToString() else x.ToString() + "(" + lstr + "," + rstr + ")") ""
-
-let stringToTree str = 
-    let chars = str |> List.ofSeq
-    let getNodeValue xs =
-        let rec loop (acc : System.Text.StringBuilder) = function
-            | [] -> (acc.ToString(), [])
-            | (','::xs) as rest -> acc.ToString(), rest
-            | ('('::xs) as rest -> acc.ToString(), rest
-            | (')'::xs) as rest-> acc.ToString(), rest
-            | x::xs -> loop (acc.Append(x)) xs
-        loop (new System.Text.StringBuilder()) xs
-    let leaf a = Branch(a, Empty, Empty)
-    let rec loop chars cont = 
-        match chars with
-            | [] -> cont (Empty, [])
-            | (x::_) as xs -> 
-                let value, rest = getNodeValue xs
-                match rest with
-                    | '('::','::rs -> if value = "" then cont (Empty, rs) else loop rs <| fun (rt,rs) -> cont (Branch(value, Empty, rt),rs)
-                    | '('::rs -> loop rs <| fun (lt,rs) -> loop rs <| fun (rt,rs) -> cont (Branch(value, lt, rt), rs)
-                    | ','::rs -> if value = "" then loop rs cont else cont (leaf value, rs)
-                    | _::rs -> cont  <| if value = "" then Empty, rs else leaf value ,rs
-                    | [] -> cont <| (leaf value, [])
-    loop chars fst
-(*[/omit]*)
 // [/snippet]
 
 // [snippet: (**) Problem 68 : Preorder and inorder sequences of binary trees]
@@ -496,43 +341,6 @@ let stringToTree str =
 ///             io = treeToInorder t } in preInTree po io >>= print
 /// Branch 'a' (Branch 'b' (Branch 'd' Empty Empty) (Branch 'e' Empty Empty)) 
 
-(*[omit:(Solution)]*)
-let inOrder tree = 
-    let rec loop tree cont =
-        match tree with
-            | Empty -> cont ""
-            | Branch(x, lt, rt) ->
-                loop lt <| fun l -> loop rt <| fun r -> cont <| l + x.ToString() + r
-
-    loop tree id
-
-let preOrder tree = 
-    let rec loop tree cont =
-        match tree with
-            | Empty -> cont ""
-            | Branch(x, lt, rt) ->
-                loop lt <| fun l -> loop rt <| fun r -> cont <| x.ToString() + l + r
-
-    loop tree id
-
-// using foldTree
-let inOrder' t   = foldTree (fun x l r acc -> l (x.ToString() + (r acc))) id t ""
-let preOrder' t  = foldTree (fun x l r acc -> x.ToString() + l (r acc))   id t ""
-
-let stringToTree' preO inO = 
-    let split (str : string) char = let arr = str.Split([|char|]) in if arr.Length = 1 then "","" else arr.[0], arr.[1]
-    let leaf x = Branch(x, Empty, Empty)
-    let rec loop xss cont =
-        match xss with
-            | [], _ -> cont (Empty, [])
-            | x::xs, inO -> 
-                match split inO x with
-                    | "", "" -> cont ((leaf x), xs)
-                    | inOl,  "" -> loop (xs,inOl) <| fun (l, xs) -> cont (Branch(x, l, Empty), xs)
-                    | "", inOr -> loop (xs, inOr) <| fun (r, xs) -> cont (Branch(x, Empty, r), xs)
-                    | inOl, inOr -> loop (xs,inOl) <| fun (l, xs) -> loop (xs, inOr) <| fun (r,xs) -> cont (Branch(x, l, r), xs)
-    loop ((preO |> List.ofSeq), inO) fst
-(*[/omit]*)
 // [/snippet]
                 
 
@@ -556,17 +364,4 @@ let stringToTree' preO inO =
 /// > tree2Dotstring it;;
 /// val it : string = "abd..e..c.fg..." 
 
-(*[omit:(Solution)]*)
-// using foldTree
-let tree2DotString t  = foldTree (fun x l r acc -> x.ToString() + l (r acc)) (fun acc -> "." + acc) t ""
-
-let dotString2Tree str = 
-    let chars = str |> List.ofSeq
-    let rec loop chars cont =
-        match chars with
-            | [] -> failwith "the string is not well formed"
-            | '.'::xs -> cont (Empty, xs)
-            | x::xs -> loop xs <| fun (l,xs) -> loop xs <| fun (r,xs) -> cont (Branch(x, l , r), xs)
-    loop chars fst
-(*[/omit]*)
 // [/snippet]
