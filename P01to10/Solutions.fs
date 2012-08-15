@@ -55,6 +55,11 @@ let rec myLast' xs =
 let myButLast xs = List.nth (List.rev xs) 1
 let myButLast' xs = (List.rev xs).[1]
 
+// A version using fold.
+let myButLast'' (x::y::zs) =
+    List.fold(fun (x,y) z -> (y,z)) (x,y) zs
+    |> fst
+
 // [/snippet]
 
 // [snippet: (*) Problem 3 : Find the K'th element of a list. The first element in the list is number 1.]
