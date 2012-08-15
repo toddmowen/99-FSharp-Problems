@@ -25,6 +25,7 @@
 /// val it : char = 'z'
 
 let rec myLast = function
+    | []    -> failwith "empty list"
     | [x]   -> x
     | _::xs -> myLast xs
 
