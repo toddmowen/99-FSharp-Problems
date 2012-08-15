@@ -24,10 +24,20 @@
 /// > myLast ['x';'y';'z'];;
 /// val it : char = 'z'
 
+// A recursive definition, using the "function" keyword.
+// Perhaps the shape of this code belies my Haskell origins?
 let rec myLast = function
     | []    -> failwith "empty list"
     | [x]   -> x
     | _::xs -> myLast xs
+
+// The same recursive definition, but using the "match" keyword.
+// This seems to be the more common idiom in F#.
+let rec myLast' xs =
+    match xs with
+    | []        -> failwith "empty list"
+    | [x]       -> x
+    | _::tail   -> myLast' tail
 
 // [/snippet]
 
