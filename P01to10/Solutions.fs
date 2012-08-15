@@ -50,7 +50,10 @@ let rec myLast' xs =
 /// > myButLast ['a'..'z'];;
 /// val it : char = 'y'
 
-
+// I actually prefer the first of these two versions, but that may just
+// be because I'm not yet used to reading F#'s index operator.
+let myButLast xs = List.nth (List.rev xs) 1
+let myButLast' xs = (List.rev xs).[1]
 
 // [/snippet]
 
