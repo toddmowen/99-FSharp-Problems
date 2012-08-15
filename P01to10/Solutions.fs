@@ -1,14 +1,10 @@
 ﻿// [snippet: Ninety-Nine F# Problems - Problems 1 - 10 - Lists]
-/// These are F# solutions of Ninety-Nine Haskell Problems 
+/// These are F# translations of Ninety-Nine Haskell Problems 
 /// (http://www.haskell.org/haskellwiki/H-99:_Ninety-Nine_Haskell_Problems), 
 /// which are themselves translations of Ninety-Nine Lisp Problems
 /// (http://www.ic.unicamp.br/~meidanis/courses/mc336/2006s2/funcional/L-99_Ninety-Nine_Lisp_Problems.html)
 /// and Ninety-Nine Prolog Problems
 /// (https://sites.google.com/site/prologsite/prolog-problems).
-///
-/// If you would like to contribute a solution or fix any bugs, send 
-/// an email to paks at kitiara dot org with the subject "99 F# problems". 
-/// I'll try to update the problem as soon as possible.
 ///
 /// The problems have different levels of difficulty. Those marked with a single asterisk (*) 
 /// are easy. If you have successfully solved the preceeding problems you should be able to 
@@ -28,7 +24,9 @@
 /// > myLast ['x';'y';'z'];;
 /// val it : char = 'z'
 
-
+let rec myLast = function
+    | [x]   -> x
+    | _::xs -> myLast xs
 
 // [/snippet]
 
