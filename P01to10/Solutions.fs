@@ -86,6 +86,11 @@ let elementAt xs n =
 
 let elementAt' xs n = xs |> Seq.skip (n-1) |> Seq.head
 
+// The "zip with an infinite list" approach does work after all.
+let elementAt'' xs n =
+    seq { for (i,x) in Seq.zip {1..System.Int32.MaxValue} xs do if i = n then yield x }
+    |> Seq.head
+
 // [/snippet]
 
 // [snippet: (*) Problem 4 : Find the number of elements of a list.]
