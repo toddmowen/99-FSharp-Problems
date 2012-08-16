@@ -76,6 +76,13 @@ let myButLast''' (xs : 'a list) = xs.[xs.Length - 2]
 /// > elementAt (List.ofSeq "fsharp") 5;;
 /// val it : char = 'r'
 
+// Vaguely inspired by the Haskell "zip with an infinite list" idiom,
+// except that we get indexes from Seq.mapi instead of an infinite list.
+let elementAt xs n =
+    xs
+    |> Seq.mapi (fun zeroBasedIndex x -> (zeroBasedIndex+1,x))
+    |> Seq.filter (fun (oneBasedIndex,x) -> oneBasedIndex = n)
+    |> Seq.head |> snd
 
 // [/snippet]
 
