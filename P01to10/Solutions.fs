@@ -84,6 +84,8 @@ let elementAt xs n =
     |> Seq.filter (fun (oneBasedIndex,x) -> oneBasedIndex = n)
     |> Seq.head |> snd
 
+let elementAt' xs n = xs |> Seq.skip (n-1) |> Seq.head
+
 // [/snippet]
 
 // [snippet: (*) Problem 4 : Find the number of elements of a list.]
