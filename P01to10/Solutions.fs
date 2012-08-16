@@ -60,6 +60,9 @@ let myButLast'' (x::y::zs) =
     List.fold(fun (x,y) z -> (y,z)) (x,y) zs
     |> fst
 
+// "Array-like" syntax: clear, but doesn't teach you anything about lists!
+let myButLast''' (xs : 'a list) = xs.[xs.Length - 2]
+
 // [/snippet]
 
 // [snippet: (*) Problem 3 : Find the K'th element of a list. The first element in the list is number 1.]
