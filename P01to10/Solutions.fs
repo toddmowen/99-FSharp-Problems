@@ -170,7 +170,7 @@ type 'a NestedList = List of 'a NestedList list | Elem of 'a
 /// val it : int list = [5]
 /// > flatten (List [Elem 1; List [Elem 2; List [Elem 3; Elem 4]; Elem 5]]);;
 /// val it : int list = [1;2;3;4;5]
-/// > flatten (List [] : int List);;
+/// > flatten (List [] : int NestedList);;
 /// val it : int list = []
 
 // First factor out the code for traversing the tree into a separate function:
