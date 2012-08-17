@@ -174,12 +174,15 @@ type 'a NestedList = List of 'a NestedList list | Elem of 'a
 /// val it : int list = []
 
 // First factor out the code for traversing the tree into a separate function:
-let rec foldNestedList(withList : 'T list -> 'T, withElem : 'a -> 'T) nlist =
-    match nlist with
-    | List sublists -> sublists |> List.map (foldNestedList(withList, withElem)) |> withList
-    | Elem elem     -> withElem elem
+// (Here we use a type extension, although we could just as easily have added
+// it to the original type definition above).
+type 'a NestedList with
+    static member fold(withList : 'T list -> 'T, withElem : 'a -> 'T) nlist =
+        match nlist with
+        | List sublists -> sublists |> List.map (NestedList.fold(withList, withElem)) |> withList
+        | Elem elem     -> withElem elem
 
-let flatten nlist = nlist |> foldNestedList(List.concat, fun x -> [x])
+let flatten nlist = nlist |> NestedList.fold(List.concat, fun x -> [x])
 
 // [/snippet]
 
