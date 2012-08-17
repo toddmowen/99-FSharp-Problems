@@ -101,7 +101,14 @@ let elementAt'' xs n =
 /// > myLength <| List.ofSeq "Hello, world!"
 /// val it : int = 13 
 
+// Let's try using local state.
+let myLength xs =
+    let count = ref 0
+    xs |> List.iter (fun _ -> count := !count + 1)
+    !count
 
+// Now back to the safety of recursion (encapsulated in a fold)...
+let myLength' xs = xs |> List.fold (fun n _ -> n + 1) 0
 
 // [/snippet]
 
