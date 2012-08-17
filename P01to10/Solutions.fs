@@ -145,6 +145,13 @@ let reverse' lst = lst |> List.fold (fun acc x -> x::acc) []
 /// > isPalindrome [1;2;4;8;16;8;4;2;1];;
 /// val it : bool = true
 
+let isPalindrome lst = (reverse lst) = lst
+
+let isPalindrome' lst =
+    let arr = Array.ofSeq lst
+    let middle = arr.Length / 2
+    Seq.forall (fun i -> arr.[i] = arr.[arr.Length - i - 1]) {0..middle}
+
 // [/snippet]
 
 // [snippet: (**) Problem 7 : Flatten a nested list structure.]
