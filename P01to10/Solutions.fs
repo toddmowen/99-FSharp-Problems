@@ -177,12 +177,11 @@ type 'a NestedList = List of 'a NestedList list | Elem of 'a
 // (Here we use a type extension, although we could just as easily have added
 // it to the original type definition above).
 type 'a NestedList with
-    static member fold(withList : 'T list -> 'T, withElem : 'a -> 'T) nlist =
-        match nlist with
+    static member fold(withList : 'T list -> 'T, withElem : 'a -> 'T) = function
         | List sublists -> sublists |> List.map (NestedList.fold(withList, withElem)) |> withList
-        | Elem elem     -> withElem elem
+        | Elem elem     -> elem |> withElem
 
-let flatten nlist = nlist |> NestedList.fold(List.concat, fun x -> [x])
+let flatten nlist = nlist |> NestedList.fold(withList=List.concat, withElem=(fun x -> [x]))
 
 // [/snippet]
 
