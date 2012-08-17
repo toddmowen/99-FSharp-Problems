@@ -123,7 +123,14 @@ let myLength' xs = xs |> List.fold (fun n _ -> n + 1) 0
 /// > reverse [1,2,3,4];;
 /// val it : int list = [4; 3; 2; 1]
 
+let reverse lst =
+    let rec loop acc lst =
+        match lst with
+        | []    -> acc
+        | x::xs -> loop (x::acc) xs
+    loop [] lst
 
+let reverse' lst = lst |> List.fold (fun acc x -> x::acc) []
 
 // [/snippet]
 
