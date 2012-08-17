@@ -185,6 +185,13 @@ type 'a NestedList with
 
 let flatten nlist = nlist |> NestedList.fold(withList=Seq.concat, withElem=Seq.singleton)
 
+// Using (and abusing?) F#'s list comprehension syntax.
+let rec flatten' nlist =
+    [ match nlist with
+        | List sublists -> for sublist in sublists do yield! flatten' sublist
+        | Elem x        -> yield x
+    ]
+
 // [/snippet]
 
 // [snippet: (**) Problem 8 : Eliminate consecutive duplicates of list elements.] 
