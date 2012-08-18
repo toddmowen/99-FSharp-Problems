@@ -262,6 +262,8 @@ let compress' xs =
 /// val it : (int * char) list =
 ///   [(4,'a');(1,'b');(2,'c');(2,'a');(1,'d');(4,'e')]
 
-
+let encode xs =
+    pack xs
+    |> List.map (fun ys -> ys.Length, ys.Head)
 
 // [/snippet]
