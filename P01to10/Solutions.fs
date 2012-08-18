@@ -17,6 +17,8 @@
 /// letters. There are actually only 88 problems.
 // [/snippet]
 
+module P01to10
+
 // [snippet: (*) Problem 1 : Find the last element of a list.]
 /// Example in F#: 
 /// > myLast [1; 2; 3; 4];;

@@ -41,6 +41,7 @@ type 'a Encoding = Multiple of int * 'a | Single of 'a
 
 // [/snippet]
 
+open P01to10
 
 // [snippet: (**) Problem 12 : Decode a run-length encoded list.]
 /// Given a run-length code list generated as specified in problem 11. Construct its 
