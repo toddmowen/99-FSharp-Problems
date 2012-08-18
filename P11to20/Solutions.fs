@@ -43,6 +43,10 @@ type 'a Encoding = Multiple of int * 'a | Single of 'a
 
 open P01to10
 
+let encodeModified xs =
+    encode xs
+    |> List.map (fun (n,x) -> if n = 1 then Single x else Multiple (n,x))
+
 // [snippet: (**) Problem 12 : Decode a run-length encoded list.]
 /// Given a run-length code list generated as specified in problem 11. Construct its 
 /// uncompressed version.
