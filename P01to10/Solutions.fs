@@ -207,6 +207,13 @@ let rec flatten' nlist =
 /// > compress ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"];;
 /// val it : string list = ["a";"b";"c";"a";"d";"e"]
 
+let compress xs =
+    let rec loop acc xs =
+        match xs with
+        | [] -> acc
+        | x::y::ys when x = y -> loop acc (y::ys)
+        | x::ys -> loop (x::acc) ys
+    xs |> loop [] |> List.rev
 
 // [/snippet]
 
