@@ -240,7 +240,19 @@ let pack xs =
             | yss -> [x]::yss
     List.fold p [] xs |> List.rev
 
-// This also allows us to solve problem 8 in a simple way:
+// Alternatively, we could use foldBack.
+// Being an eagerly evaluated language, there is not much difference in the performance
+// characteristics of fold versus foldBack. Using foldBack avoids the explicit List.rev,
+// but the reversal still has to happen internally, even if it is via the use of
+// continuations (c.f. http://lorgonblog.wordpress.com/2008/04/05/catamorphisms-part-one/).
+let pack' xs =
+    let p x acc =
+        match acc with
+            | (y::ys)::yss when x = y -> (x::y::ys)::yss
+            | yss -> [x]::yss
+    List.foldBack p xs []
+
+// The 'pack' function allows us to solve problem 8 in a simple way:
 let compress' xs =
     pack xs
     |> List.map List.head
