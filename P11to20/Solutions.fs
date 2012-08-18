@@ -61,6 +61,13 @@ let encodeModified xs =
 
 // [/snippet]
 
+let decodeModified encoding =
+    [ for item in encoding do
+        match item with
+        | Single x          -> yield x
+        | Multiple (n,x)    -> yield! List.replicate n x
+    ]
+
 // [snippet: (**) Problem 13 : Run-length encoding of a list (direct solution).]
 /// Implement the so-called run-length encoding data compression method directly. I.e. 
 /// don't explicitly create the sublists containing the duplicates, as in problem 9, 
