@@ -233,6 +233,13 @@ let compress xs =
 ///  [['a'; 'a'; 'a'; 'a']; ['b']; ['c'; 'c']; ['a'; 'a']; ['d'];
 ///   ['e'; 'e'; 'e'; 'e']]
 
+let pack xs =
+    let p acc x =
+        match acc with
+            | (y::ys)::yss when x = y -> (x::y::ys)::yss
+            | yss -> [x]::yss
+    List.fold p [] xs |> List.rev
+
 // [/snippet]
 
 // [snippet: (*) Problem 10 : Run-length encoding of a list.]
