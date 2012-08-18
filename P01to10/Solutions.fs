@@ -240,6 +240,11 @@ let pack xs =
             | yss -> [x]::yss
     List.fold p [] xs |> List.rev
 
+// This also allows us to solve problem 8 in a simple way:
+let compress' xs =
+    pack xs
+    |> List.map List.head
+
 // [/snippet]
 
 // [snippet: (*) Problem 10 : Run-length encoding of a list.]
