@@ -45,6 +45,13 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\P01to10\P01to10.fsproj">
+      <Name>P01to10</Name>
+      <Project>{2bf2ecc4-edfe-4e38-8073-12d7ec4ae127}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	     Other similar extension points exist, see Microsoft.Common.targets.
 	<Target Name="BeforeBuild">
