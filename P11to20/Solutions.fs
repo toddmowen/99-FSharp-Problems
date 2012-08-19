@@ -117,11 +117,23 @@ let encodeDirect lst =
 /// > dupli [1; 2; 3]
 /// [1;1;2;2;3;3]
 
+let dupli xs = [for x in xs do yield! [x;x]]
 
+let dupli' xs = xs |> List.collect (fun x -> [x;x])
 
+let dupli'' lst =
+    let popDouble = function
+        | x::xs -> Some ([x;x], xs)
+        | []    -> None
+    Seq.unfold popDouble lst |> List.concat
 
-
-
+// With so many steps, this is like imperative programming abstracted over lists :)
+let dupli''' xs =
+    xs
+    |> List.map (Seq.singleton >> Seq.toList)  // make singleton lists: [x]
+    |> List.zip xs                             // make tuples: (x, [x])
+    |> List.map List.Cons                      // make two-element lists
+    |> List.concat
 
 // [/snippet]
 
