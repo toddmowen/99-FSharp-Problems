@@ -100,9 +100,9 @@ let decodeModified' (encoding : 'T Encoding list) =
 let encodeDirect lst =
     let encode x acc =
         match acc with
-        | (Single y)::tail        when x = y -> (Multiple (2, y))::tail
-        | (Multiple (n, y))::tail when x = y -> (Multiple (n+1, y))::tail
-        | _                                  -> (Single x)::acc
+        | Single(y)::tail      when x = y -> Multiple(2, y)::tail
+        | Multiple(n, y)::tail when x = y -> Multiple(n+1, y)::tail
+        | _                               -> Single(x)::acc
     List.foldBack encode lst []
 
 // [/snippet]
