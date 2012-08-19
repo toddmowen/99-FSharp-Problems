@@ -97,6 +97,14 @@ let decodeModified' (encoding : 'T Encoding list) =
 ///   [Multiple (4,'a'); Single 'b'; Multiple (2,'c'); Multiple (2,'a');
 ///    Single 'd'; Multiple (4,'e')]
 
+let encodeDirect lst =
+    let encode x acc =
+        match acc with
+        | (Single y)::tail        when x = y -> (Multiple (2, y))::tail
+        | (Multiple (n, y))::tail when x = y -> (Multiple (n+1, y))::tail
+        | _                                  -> (Single x)::acc
+    List.foldBack encode lst []
+
 // [/snippet]
 
 // [snippet: (*) Problem 14 : Duplicate the elements of a list.]
