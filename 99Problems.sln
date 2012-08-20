@@ -23,8 +23,6 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "P80to89", "P80to89\P80to89.
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "P95to99", "P95to99\P95to99.fsproj", "{A10EA81A-B66E-46F7-BDBA-5E0A1B8527F8}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "P96", "P96\P96.fsproj", "{74FFDEAC-77B8-46FB-B8E6-D8F2D9187E7E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -75,10 +73,6 @@ Global
 		{A10EA81A-B66E-46F7-BDBA-5E0A1B8527F8}.Debug|x86.Build.0 = Debug|x86
 		{A10EA81A-B66E-46F7-BDBA-5E0A1B8527F8}.Release|x86.ActiveCfg = Release|x86
 		{A10EA81A-B66E-46F7-BDBA-5E0A1B8527F8}.Release|x86.Build.0 = Release|x86
-		{74FFDEAC-77B8-46FB-B8E6-D8F2D9187E7E}.Debug|x86.ActiveCfg = Debug|x86
-		{74FFDEAC-77B8-46FB-B8E6-D8F2D9187E7E}.Debug|x86.Build.0 = Debug|x86
-		{74FFDEAC-77B8-46FB-B8E6-D8F2D9187E7E}.Release|x86.ActiveCfg = Release|x86
-		{74FFDEAC-77B8-46FB-B8E6-D8F2D9187E7E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
