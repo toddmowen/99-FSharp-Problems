@@ -183,7 +183,12 @@ let filteri' test xs =
     |> List.mapi (fun i x -> [if test i x then yield x])
     |> List.concat
 
-let dropEvery lst n = lst |> filteri (fun i _ -> (i+1) % n <> 0)
+// Alternatively, I like list comprehensions, but in this case they don't gain us much.
+let filteri'' test xs =
+    let ixs = List.mapi (fun i x -> (i,x)) xs
+    [for (i,x) in ixs do if test i x then yield x]
+
+let dropEvery lst n = lst |> filteri'' (fun i _ -> (i+1) % n <> 0)
 
 // [/snippet]
 
