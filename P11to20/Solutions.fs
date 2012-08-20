@@ -205,6 +205,15 @@ let dropEvery lst n = lst |> filteri'' (fun i _ -> (i+1) % n <> 0)
 /// val it : char list * char list =
 ///   (['a'; 'b'; 'c'], ['d'; 'e'; 'f'; 'g'; 'h'; 'i'; 'k'])
 
+// Continuation passing style.
+let split lst n =
+    let rec sp lst n cont =
+        if n = 0 then cont ([], lst)
+        else match lst with
+                | []    -> failwith "List too short"
+                | x::xs -> sp xs (n-1) (fun (front, back) -> cont (x::front, back))
+    sp lst n id
+
 // [/snippet]
 
 // [snippet: (**) Problem 18 : Extract a slice from a list.]
