@@ -167,6 +167,23 @@ let repli' lst n =
 /// > dropEvery (List.ofSeq "abcdefghik") 3;;
 /// val it : char list = ['a'; 'b'; 'd'; 'e'; 'g'; 'h'; 'k']
 
+// Write a filteri function, following the pattern of List.mapi and List.iteri.
+// At first I tried to do this using options, but this turned out to be painful
+// because neither List.collect or List.concat can accept a list of options, and I
+// can't find any core functions that do (e.g. equivalent to Haskell's catMaybes).
+let filteri test xs =
+    xs
+    |> List.mapi (fun i x -> if (test i x) then Some(x) else None)
+    |> List.filter Option.isSome
+    |> List.map Option.get
+
+// Using lists as a poor man's option type gives us a more concise implementation:
+let filteri' test xs =
+    xs
+    |> List.mapi (fun i x -> [if test i x then yield x])
+    |> List.concat
+
+let dropEvery lst n = lst |> filteri (fun i _ -> (i+1) % n <> 0)
 
 // [/snippet]
 
