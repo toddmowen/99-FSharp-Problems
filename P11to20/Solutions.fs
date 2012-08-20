@@ -147,6 +147,13 @@ let dupli''' xs =
 /// > repli (List.ofSeq "abc") 3
 /// val it : char list = ['a'; 'a'; 'a'; 'b'; 'b'; 'b'; 'c'; 'c'; 'c']
 
+let repli lst n = lst |> List.collect (List.replicate n)
+
+// Using arrays internally
+let repli' lst n =
+    let input = List.toArray lst
+    let output = Array.init (input.Length * n) (fun i -> input.[i/n])
+    Array.toList output
 
 // [/snippet]
 
