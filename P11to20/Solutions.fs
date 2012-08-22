@@ -257,6 +257,20 @@ let slice' lst j k = filteri (fun i _ -> j <= (i+1) && (i+1) <= k) lst
 /// > rotate ['a';'b';'c';'d';'e';'f';'g';'h'] (-2);;
 /// val it : char list = ['g'; 'h'; 'a'; 'b'; 'c'; 'd'; 'e'; 'f']
 
+let modulo x n = (x % n + n) % n
+
+let rotate lst n =
+    let rightShift = modulo n (List.length lst)
+    Seq.skip rightShift lst
+    |> Seq.append <| Seq.take rightShift lst
+    |> Seq.toList
+
+let rotate' lst n =
+    let len = List.length lst
+    lst @ lst
+    |> Seq.skip (modulo n len)
+    |> Seq.take len
+    |> Seq.toList
 
 // [/snippet]
 
