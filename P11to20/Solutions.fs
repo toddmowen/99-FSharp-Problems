@@ -292,5 +292,9 @@ let rotate' lst n =
 /// > removeAt 1 <| List.ofSeq "abcd";;
 /// val it : char * char list = ('b', ['a'; 'c'; 'd'])
 
+let removeAt n lst =
+    match split lst n with
+    | (front, del::back) -> (del, front @ back)
+    | _                  -> failwith "Index out of bounds"
 
 // [/snippet]
