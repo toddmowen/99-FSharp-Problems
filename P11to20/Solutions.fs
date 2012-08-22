@@ -230,7 +230,12 @@ let split lst n =
 /// > slice ['a';'b';'c';'d';'e';'f';'g';'h';'i';'k'] 3 7;;
 /// val it : char list = ['c'; 'd'; 'e'; 'f'; 'g']
 
+let slice lst j k =
+    let skipLen = j - 1
+    let sliceLen = k - j + 1
+    lst |> Seq.skip skipLen |> Seq.take sliceLen |> Seq.toList
 
+let slice' lst j k = filteri (fun i _ -> j <= (i+1) && (i+1) <= k) lst 
 
 // [/snippet]
 
